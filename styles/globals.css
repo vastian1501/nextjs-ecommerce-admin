@@ -2,26 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+input, textarea {
+    @apply border-2 border-gray-300 rounded-md px-1 w-full mb-2;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+input:focus, textarea:focus {
+    @apply border-cyan-800;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+h1{
+    @apply text-cyan-800 mb-2 text-xl
+}
+
+label{
+    @apply text-cyan-800 font-normal
+}
+
+.btn-primary{
+    @apply bg-cyan-800 text-white px-4 rounded-md  py-1 w-44 my-4
+}
+
+.btn-secondary{
+    @apply bg-cyan-600 text-white px-4 rounded-md  py-1 w-24 
+}
+
+.btn-danger{
+    @apply bg-red-600 text-white px-4 rounded-md  py-1 w-16 
+}
+
+.btn-gray{
+    @apply bg-gray-600 text-white px-4 rounded-md  py-1 w-16 
 }
