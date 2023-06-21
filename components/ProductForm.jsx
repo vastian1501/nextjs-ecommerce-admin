@@ -1,5 +1,5 @@
 import Layout from "@/components/Layout"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import Alert from "@/components/Alert";
@@ -8,19 +8,21 @@ import { DotLoader, BarLoader } from "react-spinners";
 import { ReactSortable } from "react-sortablejs";
 
 const ProductForm = (info) => {
-    const { _id, name: nameInfo, description: descriptionInfo, price: priceInfo, title, images: imagesInfo } = info;
+    const { _id, name: nameInfo, category:categoryInfo, description: descriptionInfo, price: priceInfo, title, images: imagesInfo } = info;
 
     const [name, setName] = useState(nameInfo || '');
+    const [category, setCategory ] = useState(categoryInfo || '');
     const [images, setImages] = useState(imagesInfo || [])
     const [description, setDescription] = useState(descriptionInfo || '')
     const [price, setPrice] = useState(priceInfo || '')
     const [alertError, setAlertError] = useState('')
     const [isLoading, setisLoading] = useState(false);
+    const [categories, setCategories] = useState([]);
     const router = useRouter()
 
     const handleSaveProduct = async (e) => {
         e.preventDefault()
-        const data = { name, description, price, images }
+        const data = { name, description, price, images, category }
 
         if (_id) {
             await axios.put('/api/products', { ...data, _id })
@@ -59,6 +61,13 @@ const ProductForm = (info) => {
         setImages(images)
     }
 
+    useEffect(() => {
+      axios.get('/api/categories').then( response => {
+        setCategories(response.data)
+      })
+    }, [])
+    
+
     return (
         <Layout>
             <div className="flex flex-col w-full lg:w-1/2">
@@ -67,6 +76,13 @@ const ProductForm = (info) => {
                     {alertError && <Alert>{alertError}</Alert>}
                     <label htmlFor="">Nombre del producto</label>
                     <input type="text" value={name} placeholder="Nombre del producto" onChange={e => setName(e.target.value)} />
+                    <label htmlFor="">Categoria</label>
+                    <select name="" id="" value={category} onChange={e => setCategory(e.target.value)}>
+                        <option value="">Sin Categoria</option>
+                        { categories && categories.map( category => (
+                            <option key={category._id} value={category._id}>{category.name}</option>
+                        ))}
+                    </select>
                     <label htmlFor="">Fotos</label>
                     <div className="flex flex-wrap gap-1">
                         <ReactSortable list={images} setList={updateImagesOrder}  className="flex flex-wrap gap-1">

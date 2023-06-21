@@ -16,13 +16,13 @@ export default async function handler(req, res) {
     }
 
     if( method === 'POST'){
-        const {name, description, price, images} = req.body
+        const {name, description, price, images, category} = req.body
 
         if( !name || !description || !price  ){
             return res.status(400).json({error:'Los campos no pueden estar vacios'})
         }else{
             const productDoc = await Product.create({
-                name,description, price, images
+                name,description, price, images, category
             })
             return res.status(200).json({ name: 'Peticion recibida' })
         }
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
     if( method == "PUT" ){
 
-        const {_id, name, description, price, images} = req.body
+        const {_id, name, description, price, images, category} = req.body
 
         if( !name || !description || !price  ){
             return res.status(400).json({error:'Los campos no pueden estar vacios'})
@@ -43,7 +43,8 @@ export default async function handler(req, res) {
                     name,
                     description, 
                     price, 
-                    images
+                    images,
+                    category
                 }
             ) 
             return res.status(200).json({ name: 'Producto actualizado' })
