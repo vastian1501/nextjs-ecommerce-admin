@@ -5,61 +5,61 @@ export default async function handler(req, res) {
     const { method } = req
     await mongooseConect();
 
-    if( method == "GET" ){
+    if (method == "GET") {
 
-        if(req.query?.id){
-            res.json(await Product.findOne({_id:req.query.id}))
-        }else{
+        if (req.query?.id) {
+            res.json(await Product.findOne({ _id: req.query.id }))
+        } else {
             res.json(await Product.find())
         }
 
     }
 
-    if( method === 'POST'){
-        const {name, description, price, images, category} = req.body
+    if (method === 'POST') {
+        const { name, description, price, images, category, productProperties } = req.body
 
-        if( !name || !description || !price  ){
-            return res.status(400).json({error:'Los campos no pueden estar vacios'})
-        }else{
-            const productDoc = await Product.create({
-                name,description, price, images, category
+        if (!name || !description || !price) {
+            return res.status(400).json({ error: 'Los campos no pueden estar vacios' })
+        } else {
+            await Product.create({
+                name, description, price, images, category, properties
             })
             return res.status(200).json({ name: 'Peticion recibida' })
         }
 
     }
 
-    if( method == "PUT" ){
+    if (method == "PUT") {
 
-        const {_id, name, description, price, images, category} = req.body
-
-        if( !name || !description || !price  ){
-            return res.status(400).json({error:'Los campos no pueden estar vacios'})
-        }else{
-            //console.log(id)
+        const { _id, name, description, price, images, category, properties } = req.body
+        
+        if (!name || !description || !price) {
+            return res.status(400).json({ error: 'Los campos no pueden estar vacios' })
+        } else {
             await Product.updateOne(
-                {_id},
+                { _id },
                 {
                     name,
-                    description, 
-                    price, 
+                    description,
+                    price,
                     images,
-                    category
+                    category,
+                    properties,
                 }
-            ) 
+            )
             return res.status(200).json({ name: 'Producto actualizado' })
         }
 
     }
 
-    if( method == "DELETE" ){
+    if (method == "DELETE") {
 
-        if(req.query?.id){
+        if (req.query?.id) {
             //console.log(req.query?.id)
-            await Product.deleteOne({_id:req.query.id})
+            await Product.deleteOne({ _id: req.query.id })
             return res.status(200).json({ name: 'Producto borrado' })
         }
 
     }
-    
-  }
+
+}

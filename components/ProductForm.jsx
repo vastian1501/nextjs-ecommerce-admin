@@ -8,21 +8,22 @@ import { DotLoader, BarLoader } from "react-spinners";
 import { ReactSortable } from "react-sortablejs";
 
 const ProductForm = (info) => {
-    const { _id, name: nameInfo, category:categoryInfo, description: descriptionInfo, price: priceInfo, title, images: imagesInfo } = info;
+    const { _id, name: nameInfo, category: categoryInfo, description: descriptionInfo, price: priceInfo, title, images: imagesInfo, properties: propertiesInfo } = info;
 
     const [name, setName] = useState(nameInfo || '');
-    const [category, setCategory ] = useState(categoryInfo || '');
+    const [category, setCategory] = useState(categoryInfo || '');
     const [images, setImages] = useState(imagesInfo || [])
     const [description, setDescription] = useState(descriptionInfo || '')
     const [price, setPrice] = useState(priceInfo || '')
     const [alertError, setAlertError] = useState('')
     const [isLoading, setisLoading] = useState(false);
     const [categories, setCategories] = useState([]);
+    const [productProperties, setProductProperties] = useState(propertiesInfo || {})
     const router = useRouter()
 
     const handleSaveProduct = async (e) => {
         e.preventDefault()
-        const data = { name, description, price, images, category }
+        const data = { name, description, price, images, category, properties: productProperties }
 
         if (_id) {
             await axios.put('/api/products', { ...data, _id })
@@ -57,16 +58,34 @@ const ProductForm = (info) => {
         }
     }
 
-    const updateImagesOrder = (images) =>{
+    const updateImagesOrder = (images) => {
         setImages(images)
     }
 
     useEffect(() => {
-      axios.get('/api/categories').then( response => {
-        setCategories(response.data)
-      })
+        axios.get('/api/categories').then(response => {
+            setCategories(response.data)
+        })
     }, [])
-    
+
+    const propertiesToFill = [];
+    if (categories.length > 0 && category) {
+        let catInfo = categories.find(({ _id }) => _id === category);
+        propertiesToFill.push(...catInfo.properties);
+        while (catInfo?.parent?._id) {
+            const parentCat = categories.find(({ _id }) => _id === catInfo?.parent?._id);
+            propertiesToFill.push(...parentCat.properties);
+            catInfo = parentCat;
+        }
+    }
+
+    function setProductProp(propName, value) {
+        setProductProperties(prev => {
+            const newProductProps = { ...prev };
+            newProductProps[propName] = value;
+            return newProductProps;
+        });
+    }
 
     return (
         <Layout>
@@ -79,13 +98,29 @@ const ProductForm = (info) => {
                     <label htmlFor="">Categoria</label>
                     <select name="" id="" value={category} onChange={e => setCategory(e.target.value)}>
                         <option value="">Sin Categoria</option>
-                        { categories && categories.map( category => (
+                        {categories && categories.map(category => (
                             <option key={category._id} value={category._id}>{category.name}</option>
                         ))}
                     </select>
+                    {propertiesToFill.length > 0 && propertiesToFill.map(p => (
+                        <div key={p.name} className="">
+                            <label>{p.name[0].toUpperCase() + p.name.substring(1)}</label>
+                            <div>
+                                <select value={productProperties[p.name]}
+                                    onChange={ev =>
+                                        setProductProp(p.name, ev.target.value)
+                                    }
+                                >
+                                    {p.values.map(v => (
+                                        <option key={v} value={v}>{v}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    ))}
                     <label htmlFor="">Fotos</label>
                     <div className="flex flex-wrap gap-1">
-                        <ReactSortable list={images} setList={updateImagesOrder}  className="flex flex-wrap gap-1">
+                        <ReactSortable list={images} setList={updateImagesOrder} className="flex flex-wrap gap-1">
                             {!!images?.length && images.map(link => (
                                 <div key={link} className=" h-24">
                                     <img src={link} alt="" className="max-w-full h-24 rounded shadow-md border border-gray-200" />

@@ -31,5 +31,5 @@ label{
 }
 
 .btn-gray{
-    @apply bg-gray-600 text-white px-4 rounded-md  py-1 w-16 
+    @apply bg-gray-600 text-white px-4 rounded-md  py-1  
 }
